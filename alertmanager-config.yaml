@@ -1,0 +1,41 @@
+apiVersion: monitoring.coreos.com/v1alpha1
+kind: AlertmanagerConfig
+metadata:
+  annotations:
+    kubectl.kubernetes.io/last-applied-configuration: |
+      {"apiVersion":"monitoring.coreos.com/v1alpha1","kind":"AlertmanagerConfig","metadata":{"annotations":{},"name":"aiops-global-webhook","namespace":"monitoring"},"spec":{"receivers":[{"name":"drop"},{"name":"n8n-webhook","webhookConfigs":[{"httpConfig":{"basicAuth":{"password":{"key":"password","name":"n8n-webhook-basic-auth"},"username":{"key":"username","name":"n8n-webhook-basic-auth"}}},"sendResolved":true,"url":"http://n8n-svc.aiops.svc.cluster.local:5678/webhook/alertmanager"}]}],"route":{"groupBy":["alertname","namespace"],"groupInterval":"30s","groupWait":"10s","receiver":"drop","repeatInterval":"2h","routes":[{"matchers":[{"matchType":"=~","name":"alertname","value":"AIOps.*"}],"receiver":"n8n-webhook"}]}}}
+  creationTimestamp: "2026-01-11T10:50:20Z"
+  generation: 2
+  name: aiops-global-webhook
+  namespace: monitoring
+  resourceVersion: "1768153247824879012"
+  uid: 3831bab5-9faa-4525-98ba-a9ba967fd757
+spec:
+  receivers:
+  - name: drop
+  - name: n8n-webhook
+    webhookConfigs:
+    - httpConfig:
+        basicAuth:
+          password:
+            key: password
+            name: n8n-webhook-basic-auth
+          username:
+            key: username
+            name: n8n-webhook-basic-auth
+      sendResolved: true
+      url: http://n8n-svc.aiops.svc.cluster.local:5678/webhook/alertmanager
+  route:
+    groupBy:
+    - alertname
+    - namespace
+    groupInterval: 30s
+    groupWait: 10s
+    receiver: drop
+    repeatInterval: 2h
+    routes:
+    - matchers:
+      - matchType: =~
+        name: alertname
+        value: AIOps.*
+      receiver: n8n-webhook
