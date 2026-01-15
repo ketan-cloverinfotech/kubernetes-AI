@@ -468,8 +468,42 @@ To make it “better”, AI-Reco should (based on labels):
    - if alert has deployment → fetch rollout status + events
 
    - if alert has container → fetch container state and --previous logs
+#### Create service account
+```
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: ai-reco
+  namespace: aiops
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: ai-reco-readonly
+rules:
+- apiGroups: [""]
+  resources: ["pods","pods/log","events","namespaces"]
+  verbs: ["get","list","watch"]
+- apiGroups: ["apps"]
+  resources: ["deployments","replicasets"]
+  verbs: ["get","list","watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: ai-reco-readonly
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: ai-reco-readonly
+subjects:
+- kind: ServiceAccount
+  name: ai-reco
+  namespace: aiops
 
-#### 4.6 migrate the existing DB (no data loss)
+```
+
+#### 4.6 migrate the existing DB (no data loss)(may be required )
 ```
 POD=$(kubectl -n aiops get pod -l app=ai-reco -o jsonpath='{.items[0].metadata.name}')
 echo "POD=$POD"
